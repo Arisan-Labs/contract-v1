@@ -13,7 +13,7 @@ Sistem arisan terdesentralisasi di blockchain Sui - transparansi penuh, randomne
 ## 📦 Deployment
 
 **Network:** Sui Testnet  
-**Package ID:** `0xd01eba3a732dabb97b6e3bc64f59a37810d1283d00d2639472188409d4926a9e`  
+**Package ID:** `0x1469fc48582a1b211da6a4ef007004956315013dcd285edb51dc3f15a5f55d36`  
 **Explorer:** https://testnet.suivision.com
 
 ## 🏗️ Struktur
@@ -43,7 +43,7 @@ sui client switch --env testnet
 
 ### Create Pot
 ```bash
-sui client call --package 0xd01eba3a732dabb97b6e3bc64f59a37810d1283d00d2639472188409d4926a9e \
+sudo client call --package 0x1469fc48582a1b211da6a4ef007004956315013dcd285edb51dc3f15a5f55d36 \
   --module arisan \
   --function create_pot \
   --args "Arisan Keluarga" 1000000000 \
@@ -52,7 +52,7 @@ sui client call --package 0xd01eba3a732dabb97b6e3bc64f59a37810d1283d00d263947218
 
 ### Deposit
 ```bash
-sui client call --package 0xd01eba3a732dabb97b6e3bc64f59a37810d1283d00d2639472188409d4926a9e \
+sudo client call --package 0x1469fc48582a1b211da6a4ef007004956315013dcd285edb51dc3f15a5f55d36 \
   --module arisan \
   --function deposit \
   --args <pot-id> <coin-id>
@@ -60,7 +60,7 @@ sui client call --package 0xd01eba3a732dabb97b6e3bc64f59a37810d1283d00d263947218
 
 ### Draw Winner
 ```bash
-sui client call --package 0xd01eba3a732dabb97b6e3bc64f59a37810d1283d00d2639472188409d4926a9e \
+sudo client call --package 0x1469fc48582a1b211da6a4ef007004956315013dcd285edb51dc3f15a5f55d36 \
   --module arisan \
   --function draw_winner \
   --args <pot-id> <admin-cap-id>

@@ -1827,7 +1827,7 @@ Saat member buka link Pot ID, system cek:
 ## 🔗 Useful Links
 
 - **Sui Testnet**: https://testnet.suivision.com
-- **Package ID**: `0xd01eba3a732dabb97b6e3bc64f59a37810d1283d00d2639472188409d4926a9e`
+- **Package ID**: `0x1469fc48582a1b211da6a4ef007004956315013dcd285edb51dc3f15a5f55d36`
 - **Sui Docs**: https://docs.sui.io
 - **Sui Dapp Kit**: https://sdk.mystenlabs.com
 - **Testnet Faucet**: https://discord.gg/sui (channel: #testnet-faucet)

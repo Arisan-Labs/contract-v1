@@ -2,29 +2,17 @@
 
 Panduan lengkap integrasi smart contract Arisan dengan frontend React + Sui SDK.
 
-## ⚠️ IMPORTANT: V2 Updates (Open Membership Model)
+## Fitur Utama (Open Membership Model)
 
-**Smart contract telah di-upgrade ke V2 dengan model open membership!**
-
-### Perubahan Utama:
-| Aspek | V1 (Old) | V2 (New) |
-|-------|----------|----------|
-| **Admin setup** | Specify member addresses | Set max_members + deposit + cycles |
-| **Member join** | Admin add members | Member self-join via `join_pot()` |
-| **Membership check** | Vector iteration | Table lookup (O(1)) |
-| **Create function** | `create_pot(name, deposit, [addr...])` | `create_pot(name, maxMembers, deposit, totalPeriods)` |
-| **New function** | - | `join_pot()` - member bergabung |
-| **Deposit validation** | Check vector membership | Check Table membership + exact amount |
-
-### New Hooks (V2):
-- ✅ `useCreatePot()` - Parameters berubah, lihat section 3.1
-- ✅ `useJoinPot()` - **NEW** Hook untuk member join pot (section 3.1B)
-- ✅ `useDeposit()` - Updated validation, lihat section 3.2
-- ✅ `useDraw()` - Tetap sama, lihat section 3.3
-- ✅ `usePotInfo()` - Add maxMembers field
+### Hooks:
+- ✅ `useCreatePot()` - Buat pot dengan max_members, deposit, cycles
+- ✅ `useJoinPot()` - Member join pot sendiri
+- ✅ `useDeposit()` - Member deposit dengan validasi exact amount
+- ✅ `useDraw()` - Admin trigger undian
+- ✅ `usePotInfo()` - Query info pot
 
 ### Deployment Info:
-- **Package ID V2**: `0x1469fc48582a1b211da6a4ef007004956315013dcd285edb51dc3f15a5f55d36`
+- **Package ID**: `0x1469fc48582a1b211da6a4ef007004956315013dcd285edb51dc3f15a5f55d36`
 - **Network**: Testnet
 - **Status**: ✅ Deployed & Tested (All 9 tests passing)
 
@@ -50,15 +38,15 @@ npm install -D tailwindcss postcss autoprefixer
 arisan-frontend/
 ├── src/
 │   ├── components/
-│   │   ├── CreatePotForm.tsx         // ✨ NEW: V2 params
+│   │   ├── CreatePotForm.tsx         // ✨ NEW: params
 │   │   ├── JoinPotForm.tsx           // 🆕 NEW: Join functionality
-│   │   ├── DepositForm.tsx           // 🔄 UPDATED: V2 validation
+│   │   ├── DepositForm.tsx           // 🔄 UPDATED: validation
 │   │   ├── PotInfo.tsx               // Display pot info
 │   │   └── MemberView.tsx            // Member dashboard
 │   ├── hooks/
-│   │   ├── useCreatePot.ts           // ✨ NEW: V2 params
+│   │   ├── useCreatePot.ts           // ✨ NEW: params
 │   │   ├── useJoinPot.ts             // 🆕 NEW: Join pot
-│   │   ├── useDeposit.ts             // 🔄 UPDATED: V2 validation
+│   │   ├── useDeposit.ts             // 🔄 UPDATED: validation
 │   │   ├── useDraw.ts                // Draw winner
 │   │   └── usePotInfo.ts             // Query pot data
 │   ├── lib/
@@ -75,7 +63,7 @@ arisan-frontend/
 
 ### 2.1 File: `.env`
 ```bash
-# Package ID dari deployment V2 (updated)
+# Package ID dari deployment (updated)
 VITE_PACKAGE_ID=0x1469fc48582a1b211da6a4ef007004956315013dcd285edb51dc3f15a5f55d36
 VITE_NETWORK=testnet
 VITE_RPC_URL=https://fullnode.testnet.sui.io
@@ -83,8 +71,7 @@ VITE_RPC_URL=https://fullnode.testnet.sui.io
 
 ### 2.2 File: `src/lib/sui.ts` (Setup Sui Client)
 ```typescript
-// CONSTANT: Package ID dari smart contract (V2 - updated)
-export const SUI_PACKAGE_ID = 
+// CONSTANT: Package ID dari smart contract export const SUI_PACKAGE_ID = 
   '0x1469fc48582a1b211da6a4ef007004956315013dcd285edb51dc3f15a5f55d36';
 
 // CONSTANT: Module name di smart contract
@@ -99,7 +86,7 @@ export const RPC_URL = 'https://fullnode.testnet.sui.io';
 
 ## 💻 STEP 3: Core Hooks
 
-### 3.1 Hook: Create Pot (Admin Buat Arisan - UPDATED V2)
+### 3.1 Hook: Create Pot (Admin Buat Arisan - )
 
 File: `src/hooks/useCreatePot.ts`
 
@@ -111,8 +98,7 @@ import { SUI_PACKAGE_ID, ARISAN_MODULE } from '../lib/sui';
 export function useCreatePot() {
   const { mutate: signAndExecute } = useSignAndExecuteTransaction();
 
-  // ✅ FUNCTION: Buat pot arisan baru (V2 - OPEN MEMBERSHIP)
-  // @param name - Nama arisan (contoh: "Arisan Keluarga")
+  // ✅ FUNCTION: Buat pot arisan baru  // @param name - Nama arisan (contoh: "Arisan Keluarga")
   // @param maxMembers - Maximum participants (contoh: 10)
   // @param depositAmount - Jumlah setor per member (dalam MIST, 1 SUI = 1 billion MIST)
   // @param totalPeriods - Cycle duration (berapa kali undian, contoh: 3)
@@ -126,8 +112,7 @@ export function useCreatePot() {
       // 1. Buat transaction object
       const tx = new Transaction();
 
-      // 2. Call smart contract function (V2)
-      tx.moveCall({
+      // 2. Call smart contract function       tx.moveCall({
         target: \`\${SUI_PACKAGE_ID}::\${ARISAN_MODULE}::create_pot\`,
         arguments: [
           tx.pure(name),              // String: Nama arisan
@@ -162,7 +147,7 @@ export function useCreatePot() {
 }
 ```
 
-**Cara Pakai (V2):**
+**Cara Pakai:**
 ```tsx
 const { createPot } = useCreatePot();
 
@@ -173,15 +158,6 @@ createPot(
   1000000000,     // 1 SUI per deposit
   5               // 5 periode (5 kali undian)
 );
-```
-
-**Perbedaan V1 vs V2:**
-```
-V1 (Old): create_pot(name, deposit, [addr1, addr2, addr3])
-          Admin set members langsung → NPM bisa follow
-
-V2 (New): create_pot(name, maxMembers=5, deposit=1SUI, cycle=5)
-          Admin hanya set limit → Members join sendiri
 ```
 
 ---
@@ -254,7 +230,7 @@ joinPot('0xpotid...');
 
 ---
 
-### 3.2 Hook: Deposit to Pot (Member Setor Dana - UPDATED V2)
+### 3.2 Hook: Deposit to Pot (Member Setor Dana - )
 
 File: `src/hooks/useDeposit.ts`
 
@@ -272,8 +248,7 @@ interface DepositParams {
 export function useDeposit() {
   const { mutate: signAndExecute } = useSignAndExecuteTransaction();
 
-  // ✅ FUNCTION: Member deposit ke pot (V2)
-  // Validasi otomatis di smart contract:
+  // ✅ FUNCTION: Member deposit ke pot   // Validasi otomatis di smart contract:
   // - Member harus sudah join_pot() terlebih dahulu
   // - Pot sedang dalam DEPOSIT_PHASE (status 0)
   // - Amount HARUS sama dengan deposit_amount yang di-set saat create_pot
@@ -326,7 +301,7 @@ export function useDeposit() {
 }
 ```
 
-**Cara Pakai (V2):**
+**Cara Pakai:**
 ```tsx
 const { deposit } = useDeposit();
 
@@ -338,7 +313,7 @@ deposit({
 });
 ```
 
-**Validasi Otomatis di Smart Contract (V2):**
+**Validasi Otomatis di Smart Contract:**
 - ✅ Member harus join_pot() dulu (via useJoinPot hook)
 - ✅ Pot harus dalam DEPOSIT_PHASE (status 0)
 - ✅ Amount HARUS EXACT match dengan deposit_amount yang di-set saat create
@@ -347,7 +322,7 @@ deposit({
 
 ---
 
-### 3.3 Hook: Draw Winner (Admin Trigger Undian - UPDATED V2)
+### 3.3 Hook: Draw Winner (Admin Trigger Undian - )
 
 File: `src/hooks/useDraw.ts`
 
@@ -359,8 +334,7 @@ import { SUI_PACKAGE_ID, ARISAN_MODULE } from '../lib/sui';
 export function useDraw() {
   const { mutate: signAndExecute } = useSignAndExecuteTransaction();
 
-  // ✅ FUNCTION: Admin trigger drawing untuk pilih pemenang (V2)
-  // Smart contract otomatis:
+  // ✅ FUNCTION: Admin trigger drawing untuk pilih pemenang   // Smart contract otomatis:
   // 1. Memilih pemenang random dari daftar members yang deposit di periode ini
   // 2. Transfer balance pemenang (jumlah member * deposit_amount)
   // 3. Reset status ke DEPOSIT_PHASE untuk periode berikutnya
@@ -420,7 +394,7 @@ export function useDraw() {
 }
 ```
 
-**Cara Pakai (V2):**
+**Cara Pakai:**
 ```tsx
 const { drawWinner } = useDraw();
 
@@ -431,7 +405,7 @@ drawWinner(
 );
 ```
 
-**Flow Otomatis di Smart Contract (V2):**
+**Flow Otomatis di Smart Contract:**
 1. Validate: Caller punya AdminCap → Pot status DRAW_READY
 2. Random pilih: Select random winner dari members yang deposit periode ini
 3. Transfer: Kirim balance pemenang (= member_count * deposit_amount)
@@ -491,7 +465,7 @@ export function usePotInfo(potId: string | null) {
 
 ## 🎨 STEP 4: UI Components
 
-### 4.1 Component: Create Pot Form (UPDATED V2)
+### 4.1 Component: Create Pot Form ()
 
 File: `src/components/CreatePotForm.tsx`
 
@@ -531,7 +505,7 @@ export function CreatePotForm() {
     setLoading(true);
     
     try {
-      // Call V2 create_pot with new parameters
+      // Call create_pot with new parameters
       createPot(
         name,
         max,
@@ -551,7 +525,7 @@ export function CreatePotForm() {
 
   return (
     <div className="p-6 border rounded-lg bg-white shadow">
-      <h2 className="text-2xl font-bold mb-4">📝 Buat Arisan Baru (V2 - Open Membership)</h2>
+      <h2 className="text-2xl font-bold mb-4">📝 Buat Arisan Baru (Open Membership)</h2>
       
       <form onSubmit={handleSubmit} className="space-y-4">
         
@@ -570,7 +544,7 @@ export function CreatePotForm() {
           />
         </div>
 
-        {/* Max Members - NEW V2 */}
+        {/* Max Members - NEW */}
         <div>
           <label className="block text-sm font-medium mb-1">
             Maximum Members yang Bisa Join
@@ -608,7 +582,7 @@ export function CreatePotForm() {
           </p>
         </div>
 
-        {/* Total Periods - NEW V2 */}
+        {/* Total Periods - NEW */}
         <div>
           <label className="block text-sm font-medium mb-1">
             Total Periode/Cycle Arisan
@@ -630,7 +604,7 @@ export function CreatePotForm() {
 
         {/* Info Box */}
         <div className="p-3 bg-blue-50 border border-blue-200 rounded text-sm">
-          <p className="font-semibold text-blue-900 mb-2">✨ Cara Kerja V2 (Open Membership):</p>
+          <p className="font-semibold text-blue-900 mb-2">✨ Cara Kerja (Open Membership):</p>
           <ul className="text-blue-800 space-y-1">
             <li>✅ Anda (admin) membuat pot dengan parameter di atas</li>
             <li>✅ Member lain bisa melihat link pot dan klik JOIN</li>
@@ -655,7 +629,7 @@ export function CreatePotForm() {
 }
 ```
 
-**Catatan Penting V2:**
+**Catatan Penting:**
 - ❌ TIDAK ADA lagi: Upload member addresses saat create
 - ✅ BARU: Member JOIN sendiri menggunakan `useJoinPot()` hook
 - ✅ BARU: Admin hanya set limit (maxMembers) + cycle duration (totalPeriods)
@@ -746,7 +720,7 @@ export function PotInfo({ potId }: PotInfoProps) {
 
 ---
 
-### 4.2 Component: Join Pot Form (NEW V2)
+### 4.2 Component: Join Pot Form (NEW)
 
 File: `src/components/JoinPotForm.tsx`
 
@@ -851,7 +825,7 @@ export function JoinPotForm({ potId }: JoinPotFormProps) {
 
 ---
 
-### 4.3 Component: Pot Info Display (UPDATED V2)
+### 4.3 Component: Pot Info Display ()
 
 File: `src/components/PotInfo.tsx`
 
@@ -934,7 +908,7 @@ export function PotInfo({ potId }: PotInfoProps) {
 
 ---
 
-### 4.4 Component: Deposit Form (UPDATED V2)
+### 4.4 Component: Deposit Form ()
 
 File: `src/components/DepositForm.tsx`
 
@@ -1113,7 +1087,7 @@ export function App() {
                   <CreatePotForm />
                   
                   <div className="p-6 border rounded-lg bg-white shadow">
-                    <h2 className="text-2xl font-bold mb-4">🔍 Cari Arisan (V2)</h2>
+                    <h2 className="text-2xl font-bold mb-4">🔍 Cari Arisan</h2>
                     <input
                       type="text"
                       value={potId}
@@ -1241,7 +1215,7 @@ export function MemberView({ potId }: MemberViewProps) {
         <p className="text-xl font-semibold">{statusText[pot.status as 0|1|2]}</p>
       </div>
 
-      {/* Member Status - V2 */}
+      {/* Member Status */}
       {!isMember && (
         <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded">
           <p className="text-yellow-700 font-semibold mb-2">
